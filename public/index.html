@@ -4,9 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Questions Room</title>
+  <style type="text/css">
+      
+      .page.hide { display: none; }
+
+  </style>
 </head>
 <body>
-    <button type="button" id="newRoom">New Room</button>
+    <div class="page" data-page="starter">
+        <h2>New Room</h2>
+        <button type="button" id="newRoom">New Room</button>
+    </div>
+    <div class="page hide" data-page="room">
+        <h2>Questions Room</h2>
+        <form name="addQuestion">
+            <label>Your Question : <textarea name="question" rows="3"></textarea></label>
+            <button type="button" id="addQuestion">Send Question</button>
+        </form><br><br>
+        <div id="room"></div>
+    </div>
     <script type="module" src="test.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 import { db } from "./test-init-firebase.js";
-import { ref, set } from "firebase/database";
+import { ref, child, get, push, set } from "firebase/database";
 
 export default {
 	newRoom: (roomId, userId, username, email) => {
@@ -10,7 +10,22 @@ export default {
 		});
 	},
 	getRoomsById: (roomId, callback) => {
-		const roomsRef = ref(db, "rooms/" + roomId);
-		onValue(roomsRef, snapshot => callback(snapshot.val()));
+		const dbRef = ref(db);
+		get(child(dbRef, "rooms/" + roomId)).then(snapshot => {
+			if(snapshot.exists())
+				callback(snapshot.val());
+			else
+				console.log("No data available!");
+		}).catch(err => console.error(err));
+	},
+	pushQuestion: (roomId, question) => {
+		set(ref(db, "rooms/" + roomId + "/questions"), question);
+	},
+	onQuestionsValueChanged: (roomId, callback) => {
+		const questionsRef = ref(db, "rooms/" + roomId + "/questions");
+		onValue(questionsRef, snapshot => {
+			const value = snapshot.map(item => item.val());
+			callback(value);
+		});
 	}
 };
