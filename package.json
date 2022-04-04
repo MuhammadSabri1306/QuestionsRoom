@@ -1,7 +1,6 @@
 {
-  "name": "questionsroom",
+  "name": "questions-room",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,5 +14,9 @@
   "bugs": {
     "url": "https://github.com/MuhammadSabri1306/QuestionsRoom/issues"
   },
-  "homepage": "https://github.com/MuhammadSabri1306/QuestionsRoom#readme"
+  "homepage": "https://github.com/MuhammadSabri1306/QuestionsRoom#readme",
+  "description": "",
+  "dependencies": {
+    "firebase": "^9.6.10"
+  }
 }
