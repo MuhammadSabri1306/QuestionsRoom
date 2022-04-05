@@ -65,12 +65,26 @@ body {
 	border-radius: .25rem!important;
 }
 
+#forum-wrapper > .card-header {
+	background-color: var(--theme-green);
+}
+
 @media (orientation: landscape) {
 
 	#app > .panel-wrapper {
 		position: static;
 		width: 100%;
-		grid-template-columns: auto 1fr;
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+}
+
+@media (min-width: 992px) {
+
+	#app > .panel-wrapper {
+		position: static;
+		width: 100%;
+		grid-template-columns: .8fr 1.2fr;
 	}
 
 }
@@ -131,7 +145,8 @@ body {
 	color: #BCBCBC;
 }
 
-.form-user-wrapper input.form-control {
+.form-user-wrapper input.form-control,
+.new-room-wrapper input.form-control {
 	background: transparent;
 	border-color: transparent;
 	font-weight: 500;
@@ -140,18 +155,22 @@ body {
 	transition: all .5s ease-in-out;
 }
 
-.form-user-wrapper input.form-control:not(input:hover, input:active, input:focus) {
+.form-user-wrapper input.form-control:not(input:hover, input:active, input:focus),
+.new-room-wrapper input.form-control:not(input:hover, input:active, input:focus) {
 	padding-left: 0;
 	padding-right: 0;
 }
 
 .form-user-wrapper input.form-control:hover,
-.form-user-wrapper input.form-control:active {
+.form-user-wrapper input.form-control:active,
+.new-room-wrapper input.form-control:hover,
+.new-room-wrapper input.form-control:active {
     color: #fff;
     border-color: #5a5a5a;
 }
 
-.form-user-wrapper input.form-control:focus {
+.form-user-wrapper input.form-control:focus,
+.new-room-wrapper input.form-control:focus {
     color: #fff;
     border-color: var(--bs-success);
     background-color: transparent;
@@ -332,4 +351,52 @@ body {
 .question-card .question-handsup.active > small {
 	color: var(--bs-success)!important;
 	font-weight: 600;
+}
+
+.vertical-scrolled {
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 100%;
+}
+
+.bg-theme-dark {
+	background-color: var(--theme-black);
+}
+
+.btn-animation {
+	transition: padding-left .3s, padding-right .3s;
+}
+
+.btn-animation:hover,
+.btn-animation:active {
+	padding-right: 1rem;
+	padding-left: 1rem;
+}
+
+.new-room-wrapper {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.new-room-wrapper > form {
+	width: 400px;
+}
+
+.new-room-wrapper .brand {
+	margin-bottom: 6rem;
+}
+
+.new-room-wrapper [data-valid] svg {
+	display: none;
+}
+
+.new-room-wrapper [data-valid="valid"] .text-success {
+	display: block;
+}
+
+.new-room-wrapper [data-valid="unvalid"] .text-danger {
+	display: block;
 }
