@@ -77,7 +77,7 @@ export default {
 	},
 	methods: {
 		changeUsername(event){
-			this.$parent.changeUsername(event.target.value, this.userId);
+			this.$parent.changeUsername(event.target.value);
 		},
 		changeEmail(){
 			const email = this.email == "sabriahmad1306@gmail.com" ? "muhammadsabri1306@gmail.com" : "sabriahmad1306@gmail.com";

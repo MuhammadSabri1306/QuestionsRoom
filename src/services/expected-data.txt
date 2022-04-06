@@ -1,0 +1,34 @@
+rootDb: {
+	rooms: {
+		(room_id): {
+			roomName: String (room_name),
+			questions: {
+				(question_id): {
+					userId: String (sender_user_id),
+					username: String (sender_username),
+					content: String (sender_message),
+					usersHandsUp: {
+						(hands_upper_user_id): String (hands_upper_username),
+						(hands_upper_user_id): String (hands_upper_username)
+					},
+					time: Number (sending_time)
+				}
+			}
+		},
+		(room_id): {
+			roomName: String (room_name),
+			questions: {
+				(question_id): {
+					userId: String (sender_user_id),
+					username: String (sender_username),
+					content: String (sender_message),
+					usersHandsUp: {
+						(hands_upper_user_id): String (hands_upper_username),
+						(hands_upper_user_id): String (hands_upper_username)
+					},
+					time: Number (sending_time)
+				}
+			}
+		}
+	}
+}

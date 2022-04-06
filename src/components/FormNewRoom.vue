@@ -33,13 +33,15 @@
 <script>
 export default {
 	name: 'FormNewRoom',
+	props: {
+		loginStatus: String,
+		userId: String,
+		username: String,
+		email: String
+	},
 	data(){
 		return {
 			roomName: "",
-			userId: "",
-			username: "",
-			email: "",
-			loginStatus: "",
 			roomNameStatus: ""
 		};
 	},
@@ -48,29 +50,15 @@ export default {
 			this.roomNameStatus = event.target.value.length > 0 ? "valid" : "unvalid";
 		},
 		login(){
-			this.loginStatus = "valid";
-
-			this.userId = "1";
-			this.username = "Sabri";
-			this.email = "muhammadsabri1306@gmail.com";
+			this.$parent.login();
 		},
 		newRoom(){
-			if(this.userId.length < 1 || this.roomName.length < 1){
-				if(this.userId.length < 1)
-					this.loginStatus = "unvalid";
-				if(this.roomName.length < 1)
-					this.roomNameStatus = "unvalid";
+			if(this.roomName.length < 1){
+				this.roomNameStatus = "unvalid";
 				return;
 			}
 
-			this.$parent.newRoom({
-				roomName: this.roomName,
-				userId: this.userId,
-				username: this.username,
-				email: this.email
-			});
-
-			console.log(this.roomName);
+			this.$parent.newRoom(this.roomName);
 		}
 	}
 }

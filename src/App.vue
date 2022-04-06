@@ -4,7 +4,7 @@
 			<PanelUser :userId="loggedUser.userId" :isAdmin="loggedUser.isAdmin" :username="loggedUser.username" :email="loggedUser.email" />
 			<PanelForum :forumName="room.name" :questions="questions" :loggedUserId="loggedUser.userId" />
 		</div>
-		<FormNewRoom v-if="!hasRoom"></FormNewRoom>
+		<FormNewRoom v-else :userId="loggedUser.userId" :username="loggedUser.username" :email="loggedUser.email" :loginStatus="loginStatus"></FormNewRoom>
 	</div>
 </template>
 
@@ -26,6 +26,7 @@ export default {
 	data() {
 		return {
 			hasRoom: false,
+			loginStatus: "",
 			room: {
 				id: "",
 				name: ""
@@ -47,6 +48,8 @@ export default {
 		},
 		getData(){
 			return {
+				hasRoom: this.hasRoom,
+				loginStatus: this.loginStatus,
 				room: this.room,
 				loggedUser: this.loggedUser,
 				questions: this.questions
@@ -55,45 +58,76 @@ export default {
 		setHasRoom(val){
 			this.hasRoom = Boolean(val);
 		},
-		newRoom(params){
-			const data = firebase.newRoom(params);
-			this.setData(data);
-			urlParams.set("room", data.room.id);
-			this.hasRoom = true;
+		login(){
+			firebase.login(user => {
+				this.loggedUser.userId = user.uid;
+				this.loggedUser.username = user.displayName.replaceAll(" ", "_");
+				this.loggedUser.email = user.email;
+				this.loggedUser.isAdmin = true;
+				this.loginStatus = "valid";
+
+				console.log("App.loggedUser.userId = " + user.uid);
+				console.log("Set idGen in App.mounted() to follow userId format");
+			});
+		},
+		newRoom(roomName){
+			firebase.newRoom(roomName, room => {
+				this.room.id = room.id;
+				this.room.name = room.name;
+
+				this.hasRoom = true;
+				urlParams.set("room", data.room.id);
+
+				firebase.event.onQuestionChanged(this.room.id, question => {
+					this.questions.push(question);
+				}, question => {
+					const questionIndex = this.questions.indexOf(question);
+					if(questionIndex >= 0)
+						this.questions.splice(questionIndex, 1);
+				});
+			});
 		},
 		closeRoom(){
-			const data = firebase.deleteRoom();
-			this.setData(data);
-			urlParams.delete("room");
-			this.hasRoom = false;
+			firebase.deleteRoom(this.room.id, () => {
+				const id = name = userId = username = email = "",
+					isAdmin = false;
+				urlParams.delete("room");
+
+				this.hasRoom = false;
+				this.loginStatus = "";
+				this.room = { id, name };
+				this.loggedUser = { userId, isAdmin, username, email };
+				this.questions = [];
+			});
+		},
+		addQuestion(content){
+			if(this.loggedUser.username.length < 1) this.loggedUser.username = "Anonymous";
+			firebase.pushQuestion(this.room.id, this.loggedUser.userId, this.loggedUser.username, content);
+		},
+		changeUsername(username){
+			firebase.changeUsername.(this.room.id, this.loggedUser.userId, username);
+		},
+		changeEmail(email, userId){
+			this.login();
 		},
 		toggleAdminMode(){
 			this.loggedUser.isAdmin = !this.loggedUser.isAdmin;
-		},
-		changeUsername(username, userId){
-			firebase.changeUsername(this.getData(), username, userId, this.setData);
-			console.log(this.getData().questions);
-		},
-		changeEmail(email, userId){
-			firebase.changeEmail(this.getData(), email, userId, this.setData);
-		},
-		addQuestion(question){
-			if(this.loggedUser.username.length < 1) this.loggedUser.username = "Anonymous";
-			firebase.pushQuestion(this.getData(), this.loggedUser.username, this.loggedUser.userId, question, this.setData);
 		},
 		test(){
 			alert("Test success!");
 		}
 	},
-	mounted(){
+	created(){
 		const roomId = urlParams.get("room");
-		this.hasRoom = roomId != null; //sementara
-		
-		/*if(roomId != null){
-			firebase.isRoomExists(this.setHasRoom)
-		}*/
-
-		if(this.hasRoom && this.loggedUser.email.length < 1){
+		if(this.hasRoom && roomId != null){
+			firebase.getRoomQuestions(roomId, questions => {
+				this.questions = questions;
+			});
+		}
+	},
+	mounted(){
+		const isEmailRegistered = this.loggedUser.email.length > 0;
+		if(this.hasRoom && isEmailRegistered){
 			this.loggedUser.username = "Anonymous";
 
 			const idGen = () => (((1 + Math.random()) * 0x10000)|0).toString(16).substring(1);
