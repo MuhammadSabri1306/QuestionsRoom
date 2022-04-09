@@ -1,9 +1,9 @@
 <template>
-	<div class="question-card position-relative bg-white text-dark border rounded shadow py-2 px-3 mx-4 my-2" :class="{ isMine: border-success }">
+	<div class="question-card position-relative bg-white text-dark border rounded shadow py-2 px-3 mx-4 my-2" :class="{ 'is-mine': isMine }">
 		<p class="question-username">@{{ question.username }}</p>
 		<p class="question-content">{{ question.content }}</p>
 		<div class="d-flex align-items-center">
-			<ButtonHandsUp v-if="!isMine" :isHandsUp="question.isHandsUp" />
+			<ButtonHandsUp v-if="!isMine" :isHandsUp="isHandsUp" />
 			<p class="question-time ms-auto">at {{ question.time }}</p>
 		</div>
 	</div>
@@ -19,7 +19,18 @@ export default {
 	},
 	props: {
 		question: Object,
+		loggedUserId: String,
 		isMine: Boolean
+	},
+	computed: {
+		isHandsUp: function(){
+			return this.question.usersHandsUp && Object.keys(this.question.usersHandsUp).indexOf(this.loggedUserId) >= 0;
+		}
+	},
+	methods: {
+		toggleIsHandsUp(newVal){
+			this.$root.changeUsersHandsUp(this.question.key, newVal);
+		}
 	}
 }
 </script>

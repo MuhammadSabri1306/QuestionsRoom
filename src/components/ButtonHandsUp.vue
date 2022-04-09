@@ -12,8 +12,12 @@ export default {
 		isHandsUp: Boolean
 	},
 	methods: {
+		toggleIsHandsUp(){
+			this.$parent.changeIsHandsUp(!this.isHandsUp);
+		},
 		childTest(){
-			this.$parent.$parent.$parent.test();
+			// this.$parent.$parent.$parent.test();
+			this.$root.test();
 		}
 	}
 }

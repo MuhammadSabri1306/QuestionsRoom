@@ -1,7 +1,7 @@
 <template>
 	<div class="new-room-wrapper">
-		<form name="new-room">
-			<div class="brand lead">
+		<form name="new-room" @submit.prevent="newRoom">
+			<!-- <div class="brand lead">
 				<h3><i class="fas fa-comment fa-flip-horizontal"></i>QueRoom?</h3>
 				<small>-Questions Room-</small>
 			</div>
@@ -24,21 +24,28 @@
 					<i class="fas fa-ban text-danger"></i>
 					<i class="fas fa-check text-success"></i>
 				</div>
+			</div> -->
+			<p class="text-light text-center">Create new room</p>
+			<div class="row mb-4">
+				<div class="col">
+					<input type="text" class="form-control form-control-sm" placeholder="Enter the room's name" @input="roomNameValidity" v-model="roomName">
+				</div>
+				<div class="col-auto d-flex" v-if="roomNameStatus.length > 0" :data-valid="roomNameStatus">
+					<i class="fas fa-ban text-danger"></i>
+					<i class="fas fa-check text-success"></i>
+				</div>
 			</div>
 			<button type="button" class="btn d-block w-100 btn-success" @click="newRoom">New Room</button>
 		</form>
+		<footer class="position-fixed bottom-0 w-100 d-flex justify-content-center py-4">
+			<small class="text-muted"><b><i class="fab fa-github"></i> <a href="https://github.com/MuhammadSabri1306/QuestionsRoom#readme" class="text-muted text-decoration-none">MuhammadSabri1306/QuestionsRoom</a> - 2022</b></small>
+		</footer>
 	</div>
 </template>
 
 <script>
 export default {
 	name: 'FormNewRoom',
-	props: {
-		loginStatus: String,
-		userId: String,
-		username: String,
-		email: String
-	},
 	data(){
 		return {
 			roomName: "",
@@ -48,9 +55,6 @@ export default {
 	methods: {
 		roomNameValidity(event){
 			this.roomNameStatus = event.target.value.length > 0 ? "valid" : "unvalid";
-		},
-		login(){
-			this.$parent.login();
 		},
 		newRoom(){
 			if(this.roomName.length < 1){

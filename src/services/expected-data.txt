@@ -3,13 +3,13 @@ rootDb: {
 		(room_id): {
 			roomName: String (room_name),
 			questions: {
-				(question_id): {
+				(random_id): {
 					userId: String (sender_user_id),
 					username: String (sender_username),
 					content: String (sender_message),
 					usersHandsUp: {
-						(hands_upper_user_id): String (hands_upper_username),
-						(hands_upper_user_id): String (hands_upper_username)
+						(random_id): String (hands_upper_user_id),
+						(random_id): String (hands_upper_user_id)
 					},
 					time: Number (sending_time)
 				}
@@ -18,13 +18,13 @@ rootDb: {
 		(room_id): {
 			roomName: String (room_name),
 			questions: {
-				(question_id): {
+				(random_id): {
 					userId: String (sender_user_id),
 					username: String (sender_username),
 					content: String (sender_message),
 					usersHandsUp: {
-						(hands_upper_user_id): String (hands_upper_username),
-						(hands_upper_user_id): String (hands_upper_username)
+						(random_id): String (hands_upper_user_id),
+						(random_id): String (hands_upper_user_id)
 					},
 					time: Number (sending_time)
 				}
@@ -32,3 +32,5 @@ rootDb: {
 		}
 	}
 }
+
+App.loggedUser.userId = 4zAIhTV34qbKZpV2VVsEPh8uWGH2

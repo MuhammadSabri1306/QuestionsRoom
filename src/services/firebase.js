@@ -1,52 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { getDatabase, ref, push, set, update, onValue, onChildAdded, onChildRemoved, query, orderByChild } from "firebase/database";
+import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from "firebase/auth";
+import { getDatabase, ref, push, set, query, orderByChild, onChildAdded, onChildRemoved, onChildChanged } from "firebase/database";
 import firebaseConfig from "./firebase-config";
 
 initializeApp(firebaseConfig);
-
-const createId = () => {
-	const s4 = () => (((1 + Math.random()) * 0x10000)|0).toString(16).substring(1);
-	return s4() + s4() + "-" + s4() + s4() + s4() + s4();
-};
-
-const createEmptyDataRoom = (params = null) => {
-	const data = {
-		room: {
-			id: "",
-			name: ""
-		},
-		loggedUser: {
-			userId: "",
-			isAdmin: false,
-			username: "",
-			email: ""
-		},
-		questions: []
-	};
-
-	if(params === null) return data;
-
-	data.room.id = createId();
-	data.room.name = params.roomName;
-	data.loggedUser.userId = params.userId;
-	data.loggedUser.isAdmin = true;
-	data.loggedUser.username = params.username;
-	data.loggedUser.email = params.email;
-	return data;
-};
-
-const createQuestionsItem = (username, userId, content) => {
-	return {
-		username: username,
-		userId: userId,
-		content: content,
-		isHandsUp: false,
-		time: Date.now()
-	};
-};
-
-/* --------------------------- FIXED FIREBASE --------------------------- */
 
 const dateToTimeString = date => {
 	let hours = date.getHours().toString(),
@@ -58,117 +15,195 @@ const dateToTimeString = date => {
 	return hours + "." + minutes;
 };
 
+const getMainRef = path => {
+	const db = getDatabase();
+	return ref(db, path);
+};
+
 const login = callback => {
 	const provider = new GoogleAuthProvider(),
 		auth = getAuth();
+
+	provider.setCustomParameters({
+		prompt: "select_account"
+	});
+
 	signInWithPopup(auth, provider)
 		.then(result => callback(result.user))
 		.catch(error => console.error(`Error Code: ${error.code}\n${error.message}`));
 };
 
-const newRoom = (roomName, callback) => {
-	const db = getDatabase();
+const logout = callback => {
+	const auth = getAuth();
+	signOut(auth).then(callback);
+};
+
+const newRoom = roomName => {
+	/*const db = getDatabase();
 	const roomsListRef = ref(db, "rooms");
 	const newRoomPush = push(roomsListRef);
-
 	set(newRoomPush, { roomName }).then(() => {
 		callback({ id: newRoomPush.key, name: roomName });
+	});*/
+	const roomsRef = getMainRef("rooms");
+	const newRoomRef = push(roomsRef);
+	const roomId = newRoomRef.key;
+
+	const questionsRef = getMainRef(`rooms/${roomId}/questions`),
+		value = { roomId, roomName };
+
+	const onRoomDeleted: callback => {
+		onChildRemoved(roomsRef, snapshot => {
+			if(snapshot.key == roomId) callback();
+		})
+	};
+
+	const onQuestionAdded = callback => {
+		onChildAdded(questionsRef, snapshot => {
+			const key = snapshot.key;
+			let { userId, username, content, usersHandsUp, time } = snapshot.val();
+
+			let tempArr = [];
+			if(usersHandsUp)
+				Object.entries(usersHandsUp).forEach(([key, userId]) => tempArr.push({ key, userId }));
+			usersHandsUp = tempArr;
+
+			const timeObj = new Date(time);
+			time = dateToTimeString(timeObj);
+
+			callback({ key, userId, username, content, usersHandsUp, time });
+		});
+	};
+
+	const onQuestionRemoved: callback => {
+		onChildRemoved(questionsRef, snapshot => {
+			callback(snapshot.key);
+		});
+	};
+
+	return new Promise((resolve, reject) => {
+		set(newRoomRef, { roomName })
+			.then(() => {
+				resolve({ value, onRoomDeleted, onQuestionAdded, onQuestionRemoved });
+			}).catch(error => {
+				reject(error);
+			});
 	});
 };
 
-const deleteRoom = (roomId, callback) => {
-	// return createEmptyDataRoom();
-	const db = getDatabase();
+const deleteRoom = roomId => {
+	/*const db = getDatabase();
 	set(ref(db, "rooms/" + roomId), null)
 		.then(callback)
-		.catch(error => console.error(`Error Code: ${error.code}\n${error.message}`));
-};
-
-const getRoomQuestions = (roomId, loggedUserId, callback) => {
-	const db = getDatabase();
-	const questionsRef = ref(db, "rooms/" + roomId + "/questions");
-	const orderedQuestionsQuery = query(questionsRef, orderByChild("time"));
-
-	console.log(orderedQuestionsQuery);
-
-	onValue(orderedQuestionsQuery, snapshot => {
-		if(!snapshot.exists()){
-			console.log("No one questions yet!");
-			return;
-		}
-		const key = snapshot.key;
-		let { userId, username, content, usersHandsUp, time } = snapshot.val();
-
-		const isHandsUp = Object.keys(usersHandsUp).indexOf(loggedUserId) >= 0;
-		const timeObj = new Date(time);
-		time = dateToTimeString(timeObj);
-
-		callback({ key, userId, username, content, isHandsUp, time });
-	});
+		.catch(error => console.error(`Error Code: ${error.code}\n${error.message}`));*/
+	const delRoomRef = getMainRef("rooms/" + roomId);
+	set(delRoomRef, null);
 };
 
 const pushQuestion = (roomId, userId, username, content) => {
-	const db = getDatabase(),
+	/*const db = getDatabase(),
 		time = Date.now();
+	const questionsListRef = getMainRef("rooms/" + roomId);
+	set(push(questionsListRef), { userId, username, content, time });*/
+	const newQuestionRef = push(getMainRef(`rooms/${roomId}/questions`)),
+	const questionKey = newQuestionRef.key;
 
-	const questionsListRef = ref(db, "rooms/" + roomId + "/questions");
-	const newQuestionQuery = push(questionsListRef);
+	const time = Date.now(),
+		questionItemRef = getMainRef(`rooms/${roomId}/questions/${questionKey}`),
+		const usersHandsUpRef = getMainRef(`rooms/${roomId}/questions/${questionKey}/usersHandsUp`);
 
-	set(newQuestionQuery, { userId, username, content, time });
-};
+	const onQuestionChildChanged = callback => {
+		/*onChildChanged(questionItemRef, snapshot => {
+			const key = snapshot.key;
+			let { userId, username, content, usersHandsUp, time } = snapshot.val();
 
-const event = {
-	onRoomAdded: callback => {
-		const db = getDatabase();
-		const roomsListRef = ref(db, "rooms");
+			let tempArr = [];
+			if(usersHandsUp)
+				Object.entries(usersHandsUp).forEach(([key, userId]) => tempArr.push({ key, userId }));
+			usersHandsUp = tempArr;
 
-		onChildAdded(roomsListRef, data => {
-			callback({
-				id: data.key,
-				name: data.val().roomName
+			const timeObj = new Date(time);
+			time = dateToTimeString(timeObj);
+
+			callback({ key, userId, username, content, usersHandsUp, time });
+		});*/
+		onValue(questionItemRef, snapshot => {
+			const key = snapshot.key;
+			let { userId, username, content, usersHandsUp, time } = snapshot.val();
+
+			let tempArr = [];
+			if(usersHandsUp)
+				Object.entries(usersHandsUp).forEach(([key, userId]) => tempArr.push({ key, userId }));
+			usersHandsUp = tempArr;
+
+			const timeObj = new Date(time);
+			time = dateToTimeString(timeObj);
+
+			callback({ key, userId, username, content, usersHandsUp, time });
+		});
+	};
+
+	/*const onUsersHandsUpAdded = onAddedcallback => {
+		onChildAdded(usersHandsUpRef, snapshot => {
+			onAddedcallback(questionKey, { key: snapshot.key, userId: snapshot.val()});
+		});
+	};
+
+	const onUsersHandsUpRemoved = callback => {
+		onChildRemoved(usersHandsUpRef, snapshot => {
+			callback(snapshot.key);
+		});
+	};*/
+
+	return New Promise((resolve, reject) => {
+		set(newQuestionRef, { userId, username, content, time })
+			.then(() => {
+				resolve({ onQuestionChildChanged });
+			}).catch(error => {
+				reject(error);
 			});
-		});
-	},
-	onQuestionChanged: (roomId, onAddedCallback, onremovedCallback) => {
-		const db = getDatabase();
-		const questionsListRef = ref(db, "rooms/" + roomId + "/questions");
-		const getTargetQuestion = question => {
-			let { userId, username, content, time } = question;
-
-			const isHandsUp = false;
-			time = dateToTimeString(time);
-
-			return {userId, username, content, isHandsUp, time};
-		};
-
-		onChildAdded(questionsListRef, data => {
-			onAddedCallback( getTargetData(data.val()) );
-		});
-
-		onChildRemoved(questionsListRef, data => {
-			onremovedCallback( getTargetData(data.val()) );
-		});
-	}
+	});
 };
 
-const changeUsername = (roomId, userId, username) => {
-	const db = getDatabase();
-	onValue(ref(db, "rooms/" + roomId + "/questions"), snapshot => {
+const addUsersHandsUp = (roomId, questionKey, userId) => {
+	const newUsersHandsUpRef = push(getMainRef(`rooms/${roomId}/questions/${questionKey}/usersHandsUp`));
+	set(newUsersHandsUpRef, userId);
+};
+
+const removeUsersHandsUp = (roomId, questionKey, usersHandsUpKey) => {
+	const delUsersHandsUpRef = getMainRef(`rooms/${roomId}/questions/${questionKey}/usersHandsUp/${usersHandsUpKey}`);
+	set(delUsersHandsUpRef, null);
+};
+
+const changeUsername = (roomId, questionsKey, username) => {
+	const roomsRef = getMainRef("rooms/" + roomId);
+	let updates = {};
+	questionsKey.forEach(questionKey => {
+		updates["/questions/" + questionKey + "/username"] = username;
+	});
+
+	update(roomsRef, updates);
+
+	/*onValue(ref(db, "rooms/" + roomId + "/questions"), snapshot => {
 		if(!snapshot.exists()){
 			console.log("No one questions yet!");
 			return;
 		}
 
-		const updates = [];
-		snapshot.val().forEach(item => {
-			if(item.userId == userId)
-				updates["/questions/" + item.key + "/username"] = username;
-			if(Object.keys(item.usersHandsUp).indexOf(userId) >= 0)
-				updates["/questions/" + item.key + "/usersHandsUp/" + userId] = username;
+		let updates = {};
+		Object.entries(snapshot.val()).forEach(snapshotItem => {
+			const [key, item] = snapshotItem;
+			
+			if(item.userId == loggedUserId)
+				updates["/questions/" + key + "/username"] = username;
+			if(item.usersHandsUp && Object.keys(item.usersHandsUp).indexOf(loggedUserId) >= 0)
+				updates["/questions/" + item.key + "/usersHandsUp/" + loggedUserId] = username;
 		});
 		// update(ref(db), updates) return Promise
-		update(ref(db, "rooms/" + roomId), updates);
-	});
+		update(ref(db, "rooms/" + roomId), updates).then(() => {
+			getRoomQuestions(roomId, loggedUserId, callback);
+		});
+	});*/
 };
 
-export default { login, newRoom, deleteRoom, getRoomQuestions, pushQuestion, event, changeUsername };
+export default { login, logout, newRoom, deleteRoom, pushQuestion, changeUsername };

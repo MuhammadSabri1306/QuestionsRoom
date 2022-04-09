@@ -80,9 +80,7 @@ export default {
 			this.$parent.changeUsername(event.target.value);
 		},
 		changeEmail(){
-			const email = this.email == "sabriahmad1306@gmail.com" ? "muhammadsabri1306@gmail.com" : "sabriahmad1306@gmail.com";
-			const userId = this.userId == "1" ? "2" : "1";
-			this.$parent.changeEmail(email, userId);
+			this.$parent.login();
 		},
 		sendQuestion(){
 			this.$parent.addQuestion(this.question);

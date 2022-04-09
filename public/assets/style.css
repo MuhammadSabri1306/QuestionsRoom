@@ -308,6 +308,12 @@ body {
 	bottom: 0;
 }
 
+.question-card.is-mine {
+	border-color: #99d9bb!important;
+    background-color: #d0ffe2!important;
+    color: #007a42!important;
+}
+
 .question-card .question-username,
 .question-card .question-time {
 	margin: .25rem 0;
