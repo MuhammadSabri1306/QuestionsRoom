@@ -1,23 +1,25 @@
 <template>
-	<button :class="{ active: isHandsUp }" type="button" class="question-handsup btn btn-transparent" data-bs-toggle="tooltip" title="up this question" @click="childTest">
-		<small class="text-muted">Had a same question? </small>
-		<i class="fas fa-hand-point-up"></i>
-	</button>
+	<div class="handsup-wrapper">
+		<button v-if="!isMine" :class="{ active: isHandsUp }" type="button" class="btn-handsup btn rounded-pill reset-focus-shadow" @click="toggleIsHandsUp">
+			<i class="fas fa-star"></i><span class="small ms-2">{{ count }}&nbsp;users</span>
+		</button>
+		<span v-if="isMine" class="btn-handsup btn rounded-pill is-mine">
+			<i class="fas fa-star"></i><span class="small ms-2">{{ count }}&nbsp;users</span>
+		</span>
+	</div>
 </template>
 
 <script>
 export default {
 	name: 'ButtonHandsUp',
 	props: {
-		isHandsUp: Boolean
+		isMine: Boolean,
+		isHandsUp: Boolean,
+		count: Number
 	},
 	methods: {
 		toggleIsHandsUp(){
-			this.$parent.changeIsHandsUp(!this.isHandsUp);
-		},
-		childTest(){
-			// this.$parent.$parent.$parent.test();
-			this.$root.test();
+			this.$parent.toggleIsHandsUp(!this.isHandsUp);
 		}
 	}
 }

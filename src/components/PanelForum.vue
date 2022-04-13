@@ -5,7 +5,7 @@
 				<h3 class="card-title text-white mt-2">{{ forumName }}</h3>
 			</div>
 			<div id="content" class="card-body d-flex d-flex flex-column align-items-stretch">
-				<QuestionCard v-for="(q, index) in questions" :key="index" :question="q" :isMine="isMyQuestion(q.userId)" :loggedUserId="loggedUserId" />
+				<QuestionCard v-for="(question, index) in questions" :key="index" :question="question" :loggedUserId="loggedUserId" />
 			</div>
 		</div>
 	</div>
@@ -24,9 +24,9 @@ export default {
 		questions: Array,
 		loggedUserId: String
 	},
-	methods: {
-		isMyQuestion(userId){
-			return userId === this.loggedUserId;
+	data(){
+		return {
+			questionsData: []
 		}
 	}
 };

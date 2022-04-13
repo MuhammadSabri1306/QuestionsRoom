@@ -72,7 +72,7 @@ export default {
 	data(){
 		return {
 			question: "",
-			useEnter: false
+			useEnter: true
 		};
 	},
 	methods: {

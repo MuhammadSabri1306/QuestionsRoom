@@ -1,9 +1,12 @@
 <template>
-	<div class="question-card position-relative bg-white text-dark border rounded shadow py-2 px-3 mx-4 my-2" :class="{ 'is-mine': isMine }">
+	<div class="question-card position-relative border rounded shadow py-2 px-3 mx-4 my-2" :class="{ 'is-mine': isMine }">
+		<div v-if="isMine" class="position-absolute top-0 end-0 p-3">
+			<button type="button" class="btn btn-remove reset-focus-shadow"><i class="fas fa-times"></i></button>
+		</div>
 		<p class="question-username">@{{ question.username }}</p>
 		<p class="question-content">{{ question.content }}</p>
 		<div class="d-flex align-items-center">
-			<ButtonHandsUp v-if="!isMine" :isHandsUp="isHandsUp" />
+			<ButtonHandsUp :isMine="isMine" :isHandsUp="isHandsUp" :count="numUsersHandsUp" />
 			<p class="question-time ms-auto">at {{ question.time }}</p>
 		</div>
 	</div>
@@ -19,17 +22,22 @@ export default {
 	},
 	props: {
 		question: Object,
-		loggedUserId: String,
-		isMine: Boolean
+		loggedUserId: String
 	},
 	computed: {
+		isMine: function(){
+			return this.question.userId == this.loggedUserId;
+		},
+		numUsersHandsUp: function(){
+			return this.question.usersHandsUp.length;
+		},
 		isHandsUp: function(){
-			return this.question.usersHandsUp && Object.keys(this.question.usersHandsUp).indexOf(this.loggedUserId) >= 0;
+			return this.question.usersHandsUp.findIndex(user => user.userId == this.loggedUserId) >= 0;
 		}
 	},
 	methods: {
-		toggleIsHandsUp(newVal){
-			this.$root.changeUsersHandsUp(this.question.key, newVal);
+		toggleIsHandsUp(value){
+			this.$parent.$parent.changeUsersHandsUp(this.question.key, value);
 		}
 	}
 }

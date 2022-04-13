@@ -28,5 +28,6 @@ export default {
 		});
 		
 		window.location.search = urlParams;
-	}
+	},
+	has: key => getUrlParams().get(key) != null
 };
