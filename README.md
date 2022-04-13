@@ -7,4 +7,4 @@ QueRoom is a online forum app and develope to used with online meeting app. QueR
 [Vue JS V2] [Bootstrap V5] [Font Awesome 5]
 
 ## Testing
-This project already deploy in [a Firebase](https://questions-room.web.app/)
+This project already deploy in [Firebase](https://questions-room.web.app/)
