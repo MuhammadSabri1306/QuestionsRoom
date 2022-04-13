@@ -4,7 +4,7 @@
 			<div class="card-header">
 				<h3 class="card-title text-white mt-2">{{ forumName }}</h3>
 			</div>
-			<div id="content" class="card-body d-flex d-flex flex-column align-items-stretch">
+			<div id="content" class="card-body d-flex d-flex flex-column align-items-stretch vertical-scrolled">
 				<QuestionCard v-for="(question, index) in questions" :key="index" :question="question" :loggedUserId="loggedUserId" />
 			</div>
 		</div>

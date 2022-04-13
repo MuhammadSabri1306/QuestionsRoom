@@ -1,7 +1,7 @@
 <template>
 	<div class="question-card position-relative border rounded shadow py-2 px-3 mx-4 my-2" :class="{ 'is-mine': isMine }">
 		<div v-if="isMine" class="position-absolute top-0 end-0 p-3">
-			<button type="button" class="btn btn-remove reset-focus-shadow"><i class="fas fa-times"></i></button>
+			<button type="button" class="btn btn-remove reset-focus-shadow" @click="removeQuestion"><i class="fas fa-times"></i></button>
 		</div>
 		<p class="question-username">@{{ question.username }}</p>
 		<p class="question-content">{{ question.content }}</p>
@@ -36,6 +36,9 @@ export default {
 		}
 	},
 	methods: {
+		removeQuestion(){
+			this.$parent.$parent.removeQuestion(this.question.key);
+		},
 		toggleIsHandsUp(value){
 			this.$parent.$parent.changeUsersHandsUp(this.question.key, value);
 		}

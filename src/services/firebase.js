@@ -60,6 +60,11 @@ const pushQuestion = (roomId, userId, username, content) => {
 	set(newQuestionRef, { userId, username, content, time });
 };
 
+const delQuestion = (roomId, questionKey) => {
+	const delQuestionRef = getMainRef(`rooms/${roomId}/questions/${questionKey}`);
+	set(delQuestionRef, null);
+};
+
 const addUsersHandsUp = (roomId, questionKey, userId) => {
 	const newUsersHandsUpRef = push(getMainRef(`rooms/${roomId}/questions/${questionKey}/usersHandsUp`));
 	set(newUsersHandsUpRef, userId);
@@ -128,6 +133,7 @@ export default {
 	deleteRoom,
 	loadAllQuestion,
 	pushQuestion,
+	delQuestion,
 	addUsersHandsUp,
 	removeUsersHandsUp,
 	changeUsername

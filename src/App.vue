@@ -1,3 +1,9 @@
+<style>
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "./assets/fontawesome/css/all.min.css";
+@import "./assets/style.css";
+</style>
+
 <template>
 	<div id="app" class="container-lg">
 		<div v-if="hasRoom" class="panel-wrapper">
@@ -100,6 +106,9 @@ export default {
 			if(this.loggedUser.username.length < 1)
 				this.loggedUser.username = "Anonymous";
 			firebase.pushQuestion(this.room.id, this.loggedUser.userId, this.loggedUser.username, content);
+		},
+		removeQuestion(questionKey){
+			firebase.delQuestion(this.room.id, questionKey);
 		},
 		changeQuestions(questions, order = false){
 			if(!order){
@@ -214,6 +223,10 @@ export default {
 
 		window.addEventListener("online", this.updateOnlineStatus);
 		window.addEventListener("offline", this.updateOnlineStatus);
+
+		let webTitle = "QueRoom";
+		if(this.hasRoom) webTitle = this.room.name + webTitle;
+		document.title = webTitle;
 
 		if(this.hasRoom && this.isOnline)
 			this.loadAllQuestions();
