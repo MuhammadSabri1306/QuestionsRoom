@@ -1,24 +1,10 @@
-# questions-room
+# QueRoom
 
-## Project setup
-```
-npm install
-```
+QueRoom is a online forum app and develope to used with online meeting app. QueRoom can manage the users questions as real time using Firebase Realtime Database.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Vendor
 
-### Compiles and minifies for production
-```
-npm run build
-```
+[Vue JS V2] [Bootstrap V5] [Font Awesome 5]
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Testing
+This project already deploy in [a Firebase](https://questions-room.web.app/)
